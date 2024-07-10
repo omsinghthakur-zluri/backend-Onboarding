@@ -13,7 +13,7 @@ const addTransaction = async (req, res) => {
       VALUES ($1, $2, $3, $4)
       RETURNING *;`;
 
-    // Execute the query with parameters
+    // Execute the query with parameters 
     const result = await db.query(query, [
       transaction_date,
       description,
