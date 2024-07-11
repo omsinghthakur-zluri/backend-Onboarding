@@ -14,7 +14,7 @@ const currencyExchangeByDate = async (transaction_date, currency) => {
   try {
     const response = await fetch(url, options);
     const result = await response.json();
-
+    // console.log(result);
     curr1ToCurr2 = result.rates;
     // console.log(curr1ToCurr2);
     return curr1ToCurr2;
