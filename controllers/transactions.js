@@ -125,7 +125,7 @@ const getPaginatedTransactions = async (req, res) => {
     const query = `
       SELECT *
       FROM transactions
-      ORDER BY transaction_date DESC
+      ORDER BY id DESC
       LIMIT $1 OFFSET $2;`;
 
     // Execute the query with limit and offset
