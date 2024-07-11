@@ -93,9 +93,13 @@ app.post(
           }
           continue; // Skip this transaction and move to the next one
         }
+
         const transactionDate = transaction.Date.split("-").reverse().join("-"); // DD-MM-YYYY to YYYY-MM-DD
 
         // console.log(transactionDate);
+        if (countOfEmptyFields >= 1) {
+          throw new Error("Validation failed.");
+        }
         const amount = parseInt(transaction.Amount);
         // const convertedAmount = fetchFromAPI();
         // console.log(amount);
@@ -108,7 +112,7 @@ app.post(
         const { Description, Currency } = transaction;
         // console.log(Description);
         const convertedAmount = curr1ToCurr2[Currency];
-        console.log(amount, amount / convertedAmount);
+        // console.log(amount, amount / convertedAmount);
         await db.query(queryText, [
           transactionDate,
           Description,
