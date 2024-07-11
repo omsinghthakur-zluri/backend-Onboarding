@@ -40,8 +40,6 @@ app.post(
       VALUES ($1, $2, $3, $4)
     `;
 
-      let curr1ToCurr2 = {};
-
       // const url = `https://currency-converter18.p.rapidapi.com/api/v1/convert?from=USD&to=INR&amount=1`;
       // const options = {
       //   method: "GET",
@@ -60,7 +58,7 @@ app.post(
       // } catch (error) {
       //   console.error(error);
       // }
-
+      let curr1ToCurr2 = {};
       try {
         const response = await fetch(
           "https://v6.exchangerate-api.com/v6/68b1d8f37a5118c0fa817d43/latest/INR"
@@ -78,8 +76,15 @@ app.post(
       // console.log(curr1ToCurr2.USD);
 
       let countOfEmptyFields = 0;
+      const validCurrencies = Object.keys(curr1ToCurr2);
+      const today = new Date();
+
       for (const transaction of transactions) {
-        // Convert transaction_date to PostgreSQL DATE type
+        const { Description, Currency } = transaction;
+        if (countOfEmptyFields >= 1) {
+          throw new Error("Validation failed.");
+        }
+
         if (
           !transaction.Date ||
           !transaction.Amount ||
@@ -96,10 +101,57 @@ app.post(
 
         const transactionDate = transaction.Date.split("-").reverse().join("-"); // DD-MM-YYYY to YYYY-MM-DD
 
-        // console.log(transactionDate);
-        if (countOfEmptyFields >= 1) {
-          throw new Error("Validation failed.");
+        const transaction_Date = new Date(transactionDate);
+        // console.log(today, transaction_Date);
+        if (
+          transaction_Date.toString() === "Invalid Date" ||
+          transaction_Date > today
+        ) {
+          console.warn(
+            "Skipping transaction with invalid or future date:",
+            transaction
+          );
+          countOfEmptyFields += 1;
+          if (countOfEmptyFields > 1) {
+            throw new Error("Validation failed.");
+          }
+          continue;
         }
+        if (transactionDate > today) {
+          console.log(transactionDate, today);
+          console.warn("Skipping transaction with future date:", transaction);
+          countOfEmptyFields += 1;
+          if (countOfEmptyFields > 1) {
+            throw new Error("Validation failed.");
+          }
+          continue;
+        }
+
+        if (!validCurrencies.includes(Currency)) {
+          console.warn(
+            "Skipping transaction with invalid currency:",
+            transaction
+          );
+          countOfEmptyFields += 1;
+          if (countOfEmptyFields > 1) {
+            throw new Error("Validation failed.");
+          }
+          continue;
+        }
+        if (Description.trim() === "") {
+          console.warn(
+            "Skipping transaction with empty description:",
+            transaction
+          );
+          countOfEmptyFields += 1;
+          if (countOfEmptyFields > 1) {
+            throw new Error("Validation failed.");
+          }
+          continue;
+        }
+
+        // console.log(transactionDate);
+
         const amount = parseInt(transaction.Amount);
         // const convertedAmount = fetchFromAPI();
         // console.log(amount);
@@ -109,7 +161,7 @@ app.post(
         // amount = parseFloat(amount);
 
         // Validate or transform other fields as necessary
-        const { Description, Currency } = transaction;
+
         // console.log(Description);
         const convertedAmount = curr1ToCurr2[Currency];
         // console.log(amount, amount / convertedAmount);
