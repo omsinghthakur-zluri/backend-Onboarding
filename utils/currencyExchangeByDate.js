@@ -1,7 +1,7 @@
 const currencyExchangeByDate = async (transaction_date, currency) => {
   let curr1ToCurr2 = {};
-//   console.log(transaction_date);
-  const url = `https://currency-conversion-and-exchange-rates.p.rapidapi.com/${transaction_date}?from=${currency}&to=INR%2CGBP`;
+  //   console.log(transaction_date);
+  const url = `${process.env.CURRENCY_EXCHANGE_BY_DATE}/${transaction_date}?from=${currency}&to=INR%2CGBP`;
   const options = {
     method: "GET",
     headers: {
