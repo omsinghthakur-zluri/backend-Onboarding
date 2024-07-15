@@ -1,6 +1,6 @@
 const express = require("express");
 const dotenv = require("dotenv");
-const db = require("./config/db"); // Import your database configuration
+// const db = require("./config/db"); // Import your database configuration
 const transactionRouter = require("./routes/transactions");
 const cors = require("cors");
 
@@ -9,6 +9,7 @@ const cors = require("cors");
 dotenv.config();
 
 const app = express();
+// var message = "Hello, world!";
 app.use(cors());
 app.use(express.json());
 

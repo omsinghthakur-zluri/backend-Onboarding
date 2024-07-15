@@ -172,6 +172,7 @@ const uploadCSV = async (req, res) => {
     // Parse CSV data
     const results = Papa.parse(fileContent, { header: true });
     const transactions = results.data;
+    // console.log(transactions[0]);
 
     await db.query("BEGIN");
 
