@@ -10,6 +10,9 @@ const currencyExchangeByDate = require("../utils/currencyExchangeByDate");
 const addTransaction = async (req, res) => {
   try {
     const { transaction_date, description, amount, currency } = req.body;
+    if (amount < 0) {
+      throw new Error("amount not be negative");
+    }
     let curr1ToCurr2 = await currencyExchangeByDate(transaction_date, currency);
     const convertedAmount = curr1ToCurr2[currency];
     // console.log(amount, amount / convertedAmount, "check");
@@ -31,8 +34,7 @@ const addTransaction = async (req, res) => {
       amountInINR,
     ]);
 
-    // Respond with the inserted transaction data
-    res.status(201).json(result.rows[0]); // Assuming you want to return the inserted row
+    res.status(201).json(result.rows[0]);
   } catch (err) {
     console.error("Error adding transaction:", err);
     res.status(500).json({ error: "Failed to add transaction" });
@@ -85,12 +87,6 @@ const editTransaction = async (req, res) => {
 const deleteTransaction = async (req, res) => {
   try {
     const { id } = req.params; // Extract transaction ID from URL parameters
-
-    // Delete query to remove a transaction by ID
-    // const query = `
-    //   DELETE FROM transactions
-    //   WHERE id = $1
-    //   RETURNING *;`;
 
     // Execute the query with the transaction ID
     const result = await db.query(`
@@ -254,14 +250,9 @@ const uploadCSV = async (req, res) => {
       // console.log(transactionDate);
 
       const amount = parseInt(transaction.Amount);
-      // const convertedAmount = fetchFromAPI();
-      // console.log(amount);
-
-      // const convertedAmount = usdToInr;
-
-      // amount = parseFloat(amount);
-
-      // Validate or transform other fields as necessary
+      if (amount < 0) {
+        throw new Error("amount not be negative");
+      }
 
       // console.log(Description);
       const convertedAmount = curr1ToCurr2[Currency];
